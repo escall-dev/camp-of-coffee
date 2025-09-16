@@ -19,6 +19,28 @@ requireLogin();
             --coffee-light: #D2691E;
             --sidebar-width: 260px;
             --sidebar-collapsed-width: 80px;
+            
+            /* Light theme colors */
+            --bg-color: #f8f9fa;
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --shadow: rgba(0,0,0,0.08);
+            --shadow-hover: rgba(0,0,0,0.12);
+            --table-hover: rgba(139, 69, 19, 0.05);
+        }
+        
+        [data-theme="dark"] {
+            /* Dark theme colors */
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --text-muted: #b0b0b0;
+            --border-color: #333333;
+            --shadow: rgba(255,255,255,0.05);
+            --shadow-hover: rgba(255,255,255,0.1);
+            --table-hover: rgba(139, 69, 19, 0.2);
         }
         
         * {
@@ -28,8 +50,10 @@ requireLogin();
         }
         
         body {
-            background-color: #f8f9fa;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-color 0.3s ease, color 0.3s ease;
         }
         
         /* Sidebar Styles */
@@ -313,12 +337,15 @@ requireLogin();
         
         .card {
             border: none;
-            box-shadow: 0 2px 4px rgba(0,0,0,.08);
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 4px var(--shadow);
             transition: all 0.3s;
         }
         
         .card:hover {
-            box-shadow: 0 4px 8px rgba(0,0,0,.12);
+            box-shadow: 0 4px 8px var(--shadow-hover);
         }
         
         .stat-card {
@@ -326,7 +353,15 @@ requireLogin();
         }
         
         .table-hover tbody tr:hover {
-            background-color: rgba(139, 69, 19, 0.05);
+            background-color: var(--table-hover);
+        }
+        
+        .table {
+            color: var(--text-color);
+        }
+        
+        .text-muted {
+            color: var(--text-muted) !important;
         }
         
         .badge-success {
@@ -371,6 +406,237 @@ requireLogin();
         
         .sidebar.collapsed .user-dropdown.dropup .dropdown-menu {
             min-width: 150px;
+        }
+        
+        /* Modal and Form Elements Dark Mode Support */
+        .modal-content {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .modal-header {
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        .modal-footer {
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .form-control, .form-select {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        .form-control:focus, .form-select:focus {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border-color: var(--coffee-primary);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
+        }
+        
+        .dropdown-menu {
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+        
+        .dropdown-item {
+            color: var(--text-color);
+        }
+        
+        .dropdown-item:hover, .dropdown-item:focus {
+            background-color: var(--table-hover);
+            color: var(--text-color);
+        }
+        
+        .alert {
+            border: 1px solid var(--border-color);
+        }
+        
+        .list-group-item {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        /* DataTables Dark Mode Support - Force Override */
+        [data-theme="dark"] .dataTables_wrapper,
+        [data-theme="dark"] .dataTables_wrapper * {
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card .table-responsive,
+        [data-theme="dark"] .table-responsive {
+            background-color: transparent !important;
+        }
+        
+        [data-theme="dark"] .dataTables_length,
+        [data-theme="dark"] .dataTables_filter,
+        [data-theme="dark"] .dataTables_info,
+        [data-theme="dark"] .dataTables_paginate {
+            color: var(--text-color);
+        }
+        
+        [data-theme="dark"] .dataTables_length select,
+        [data-theme="dark"] .dataTables_filter input {
+            background-color: var(--card-bg);
+            color: var(--text-color);
+            border: 1px solid var(--border-color);
+        }
+        
+        [data-theme="dark"] .paginate_button {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+        
+        [data-theme="dark"] .paginate_button:hover {
+            background-color: var(--table-hover) !important;
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .paginate_button.current {
+            background-color: var(--coffee-primary) !important;
+            color: white !important;
+        }
+        
+        [data-theme="dark"] .dataTables_wrapper .dataTables_length,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_filter,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_info,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_paginate {
+            color: var(--text-color);
+        }
+        
+        [data-theme="dark"] .dataTables_wrapper .dataTables_length label,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_filter label {
+            color: var(--text-color);
+        }
+        
+        [data-theme="dark"] table.dataTable,
+        [data-theme="dark"] table.dataTable thead,
+        [data-theme="dark"] table.dataTable thead th,
+        [data-theme="dark"] table.dataTable tbody,
+        [data-theme="dark"] table.dataTable tbody tr,
+        [data-theme="dark"] table.dataTable tbody td,
+        [data-theme="dark"] .table,
+        [data-theme="dark"] .table thead,
+        [data-theme="dark"] .table thead th,
+        [data-theme="dark"] .table tbody,
+        [data-theme="dark"] .table tbody tr,
+        [data-theme="dark"] .table tbody td {
+            background-color: transparent !important;
+            background: transparent !important;
+            color: var(--text-color) !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        [data-theme="dark"] table.dataTable thead th {
+            border-bottom: 2px solid var(--border-color) !important;
+            background-color: rgba(139, 69, 19, 0.1) !important;
+        }
+        
+        [data-theme="dark"] table.dataTable tbody tr {
+            background-color: transparent !important;
+        }
+        
+        [data-theme="dark"] table.dataTable tbody tr:hover,
+        [data-theme="dark"] table.dataTable tbody tr:hover td {
+            background-color: var(--table-hover) !important;
+        }
+        
+        [data-theme="dark"] table.dataTable tbody tr:nth-child(even) {
+            background-color: rgba(255,255,255,0.02) !important;
+        }
+        
+        [data-theme="dark"] table.dataTable tbody tr:nth-child(odd) {
+            background-color: transparent !important;
+        }
+        
+        [data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--table-hover) !important;
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: var(--coffee-primary) !important;
+            border: 1px solid var(--coffee-primary) !important;
+            color: white !important;
+        }
+        
+        /* Make sure cards blend with dark background */
+        [data-theme="dark"] .card {
+            background-color: rgba(30, 30, 30, 0.8) !important;
+            border: 1px solid var(--border-color) !important;
+        }
+        
+        /* Fix pagination wrapper background */
+        [data-theme="dark"] .dataTables_wrapper .dataTables_paginate {
+            background-color: transparent !important;
+        }
+        
+        /* Fix search and length controls background */
+        [data-theme="dark"] .dataTables_wrapper .dataTables_length,
+        [data-theme="dark"] .dataTables_wrapper .dataTables_filter {
+            background-color: transparent !important;
+        }
+        
+        /* Force Bootstrap table dark styling */
+        [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > td,
+        [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(odd) > th {
+            background-color: rgba(255,255,255,0.02) !important;
+        }
+        
+        [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) > td,
+        [data-theme="dark"] .table-striped > tbody > tr:nth-of-type(even) > th {
+            background-color: transparent !important;
+        }
+        
+        [data-theme="dark"] .table-hover > tbody > tr:hover > td,
+        [data-theme="dark"] .table-hover > tbody > tr:hover > th {
+            background-color: var(--table-hover) !important;
+        }
+        
+        /* Override any remaining white backgrounds */
+        [data-theme="dark"] .table thead th,
+        [data-theme="dark"] .table tbody td,
+        [data-theme="dark"] .table tfoot td {
+            background-color: transparent !important;
+            background: none !important;
+        }
+        
+        /* Special handling for regular Bootstrap tables (like My Activity) */
+        [data-theme="dark"] .card .table,
+        [data-theme="dark"] .table-responsive .table {
+            background-color: transparent !important;
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .card .table thead th {
+            background-color: rgba(139, 69, 19, 0.1) !important;
+            color: var(--text-color) !important;
+            border-bottom: 2px solid var(--border-color) !important;
+        }
+        
+        [data-theme="dark"] .card .table tbody tr,
+        [data-theme="dark"] .card .table tbody td {
+            background-color: transparent !important;
+            color: var(--text-color) !important;
+            border-color: var(--border-color) !important;
+        }
+        
+        [data-theme="dark"] .card .table tbody tr:hover {
+            background-color: var(--table-hover) !important;
         }
         
         @media (min-width: 769px) {
@@ -430,6 +696,12 @@ requireLogin();
                     <span class="nav-text">My Activity</span>
                 </a>
             </div>
+            <div class="nav-item">
+                <a href="#" class="nav-link" onclick="toggleTheme(); return false;">
+                    <i class='bx bx-moon nav-icon' id="theme-icon"></i>
+                    <span class="nav-text">Dark Mode</span>
+                </a>
+            </div>
             <?php if (isAdmin()): ?>
             <div class="nav-item">
                 <a href="users.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
@@ -470,6 +742,11 @@ requireLogin();
                     <li>
                         <a class="dropdown-item" href="profile.php">
                             <i class='bx bx-user-circle me-2'></i>My Profile
+                        </a>
+                    </li>
+                    <li>
+                        <a class="dropdown-item" href="my_activity.php">
+                            <i class='bx bx-list-ul me-2'></i>My Activity
                         </a>
                     </li>
                     <li>

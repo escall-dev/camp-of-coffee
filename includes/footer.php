@@ -1,7 +1,7 @@
     </div>
     
-    <footer class="bg-light py-3 mt-5">
-        <div class="container text-center text-muted">
+    <footer class="py-3 mt-5" style="background-color: var(--card-bg); border-top: 1px solid var(--border-color);">
+        <div class="container text-center" style="color: var(--text-muted);">
             <small>&copy; <?php echo date('Y'); ?> Camp Of Coffee - Sales & Inventory System</small>
         </div>
     </footer>
@@ -89,6 +89,39 @@
                 }
             }
         });
+        
+        // Theme toggle functionality
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        const body = document.body;
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // Initialize theme
+        function initializeTheme() {
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('bx-moon', 'bx-sun');
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.classList.replace('bx-sun', 'bx-moon');
+            }
+        }
+        
+        // Toggle theme
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', currentTheme);
+            
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('bx-moon', 'bx-sun');
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.classList.replace('bx-sun', 'bx-moon');
+            }
+        }
+        
+        // Initialize theme on page load
+        initializeTheme();
     </script>
 </body>
 </html>

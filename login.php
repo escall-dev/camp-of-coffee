@@ -67,6 +67,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
     <style>
+        :root {
+            --coffee-primary: #8B4513;
+            --coffee-secondary: #6F4E37;
+            --coffee-light: #D2691E;
+            
+            /* Light theme colors */
+            --bg-overlay: rgba(255,255,255,0.95);
+            --card-bg: #ffffff;
+            --text-color: #212529;
+            --text-muted: #6c757d;
+            --border-color: #dee2e6;
+            --input-bg: #ffffff;
+            --input-border: #ced4da;
+        }
+        
+        [data-theme="dark"] {
+            /* Dark theme colors */
+            --bg-overlay: rgba(30,30,30,0.95);
+            --card-bg: #1e1e1e;
+            --text-color: #ffffff;
+            --text-muted: #b0b0b0;
+            --border-color: #444444;
+            --input-bg: #2d2d2d;
+            --input-border: #555555;
+        }
+        
         body {
             background: url('assets/images/coc-place2.jpg') no-repeat center center fixed;
             background-size: cover;
@@ -74,14 +100,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             display: flex;
             align-items: center;
             justify-content: center;
+            color: var(--text-color);
+            transition: color 0.3s ease;
         }
         .login-container {
-            background: rgba(255,255,255,0.95);
+            background: var(--bg-overlay);
             border-radius: 20px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3);
             overflow: hidden;
             max-width: 400px;
             width: 100%;
+            border: 1px solid var(--border-color);
+            transition: background 0.3s ease, border-color 0.3s ease;
         }
         .login-header {
             background: #6F4E37;
@@ -93,9 +123,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             font-size: 3rem;
             margin-bottom: 1rem;
         }
+        .form-control {
+            background-color: var(--input-bg);
+            color: var(--text-color);
+            border: 1px solid var(--input-border);
+            transition: all 0.3s ease;
+        }
+        
         .form-control:focus {
             border-color: #8B4513;
             box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25);
+            background-color: var(--input-bg);
+            color: var(--text-color);
+        }
+        
+        .form-control::placeholder {
+            color: var(--text-muted);
         }
         .btn-coffee {
             background: #8B4513;
@@ -117,9 +160,39 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             border-radius: 50%;
             margin-bottom: 1rem;
         }
+        
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--coffee-primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 1000;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .theme-toggle:hover {
+            background: var(--coffee-secondary);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
+    <!-- Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+        <i class="bi bi-moon-fill" id="theme-icon"></i>
+    </button>
+    
     <div class="login-container">
         <div class="login-header">
             <?php if (file_exists('assets/images/coc_logo.jpg')): ?>
@@ -191,5 +264,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Theme toggle functionality
+        let currentTheme = localStorage.getItem('theme') || 'light';
+        const body = document.body;
+        const themeIcon = document.getElementById('theme-icon');
+        
+        // Initialize theme
+        function initializeTheme() {
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+            }
+        }
+        
+        // Toggle theme
+        function toggleTheme() {
+            currentTheme = currentTheme === 'light' ? 'dark' : 'light';
+            localStorage.setItem('theme', currentTheme);
+            
+            if (currentTheme === 'dark') {
+                body.setAttribute('data-theme', 'dark');
+                themeIcon.classList.replace('bi-moon-fill', 'bi-sun-fill');
+            } else {
+                body.removeAttribute('data-theme');
+                themeIcon.classList.replace('bi-sun-fill', 'bi-moon-fill');
+            }
+        }
+        
+        // Initialize theme on page load
+        initializeTheme();
+        
+        // Auto-hide alerts after 5 seconds
+        setTimeout(function() {
+            document.querySelectorAll('.alert').forEach(function(alert) {
+                alert.style.opacity = '0';
+                setTimeout(function() {
+                    alert.style.display = 'none';
+                }, 300);
+            });
+        }, 5000);
+    </script>
 </body>
 </html>
