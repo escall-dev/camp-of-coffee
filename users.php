@@ -122,7 +122,7 @@ require_once 'includes/header.php';
         </h2>
         <p class="text-muted">Manage system users and their access levels</p>
     </div>
-    <div class="col-auto">
+    <div class="col-auto me-5">
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
             <i class="bi bi-person-plus me-2"></i>Add New User
         </button>

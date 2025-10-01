@@ -76,7 +76,7 @@ require_once 'includes/header.php';
             <i class="bi bi-box-seam me-2"></i>Products Management
         </h2>
     </div>
-    <div class="col-auto">
+    <div class="col-auto me-5">
         <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addProductModal">
             <i class="bi bi-plus-circle me-2"></i>Add New Product
         </button>

@@ -67,6 +67,7 @@ requireLogin();
             transition: all 0.3s ease;
             z-index: 1000;
             box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            overflow: visible;
         }
         
         .sidebar.collapsed {
@@ -145,6 +146,7 @@ requireLogin();
         
         .nav-item {
             margin: 5px 0;
+            position: relative;
         }
         
         .nav-link {
@@ -155,13 +157,17 @@ requireLogin();
             text-decoration: none;
             transition: all 0.3s ease;
             position: relative;
-            overflow: hidden;
+            overflow: visible;
         }
         
         .nav-link:hover {
             background: rgba(255,255,255,0.1);
             color: white;
             transform: translateX(5px);
+        }
+        
+        .sidebar.collapsed .nav-link:hover {
+            transform: none;
         }
         
         .nav-link.active {
@@ -245,6 +251,7 @@ requireLogin();
             justify-content: center;
             font-size: 18px;
             overflow: hidden;
+            flex-shrink: 0;
         }
         
         .user-avatar-img {
@@ -264,6 +271,59 @@ requireLogin();
             opacity: 0;
             width: 0;
             overflow: hidden;
+        }
+        
+        /* Collapsed sidebar user profile adjustments */
+        .sidebar.collapsed .user-info {
+            gap: 0;
+            justify-content: center;
+            padding: 10px;
+        }
+        
+        .sidebar.collapsed .user-profile {
+            padding: 15px;
+        }
+        
+        /* Floating Theme Toggle Button */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: var(--coffee-primary);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 2000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .theme-toggle:hover {
+            background: var(--coffee-light);
+            transform: scale(1.1);
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+        }
+        
+        .theme-toggle:active {
+            transform: scale(0.95);
+        }
+        
+        /* Responsive adjustments for theme toggle */
+        @media (max-width: 768px) {
+            .theme-toggle {
+                width: 45px;
+                height: 45px;
+                font-size: 1.1rem;
+                top: 15px;
+                right: 15px;
+            }
         }
         
         .user-name {
@@ -639,6 +699,116 @@ requireLogin();
             background-color: var(--table-hover) !important;
         }
         
+        /* Tooltip Styles */
+        .nav-tooltip {
+            position: absolute;
+            left: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            background: var(--coffee-primary);
+            color: white;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 1100;
+            margin-left: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            pointer-events: none;
+        }
+        
+        .nav-tooltip::before {
+            content: '';
+            position: absolute;
+            right: 100%;
+            top: 50%;
+            transform: translateY(-50%);
+            border: 6px solid transparent;
+            border-right-color: var(--coffee-primary);
+        }
+        
+        .sidebar.collapsed .nav-item:hover .nav-tooltip {
+            opacity: 1 !important;
+            visibility: visible !important;
+            margin-left: 20px;
+        }
+        
+        /* Debug: Force show tooltips when collapsed for testing */
+        .sidebar.collapsed .nav-tooltip {
+            display: block !important;
+        }
+        
+        /* Hide tooltips when sidebar is expanded */
+        .sidebar:not(.collapsed) .nav-tooltip {
+            display: none;
+        }
+        
+        /* Ensure tooltips don't show on mobile */
+        @media (max-width: 768px) {
+            .nav-tooltip {
+                display: none !important;
+            }
+        }
+
+        /* AJAX Loading Overlay */
+        #loading-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        /* Loading Progress Bar */
+        .loading-progress {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 0%;
+            height: 3px;
+            background: var(--coffee-primary);
+            z-index: 10000;
+            transition: width 0.3s ease;
+            opacity: 0;
+        }
+        
+        .loading-progress.active {
+            opacity: 1;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+            color: white;
+        }
+        
+        .loading-text {
+            margin-top: 15px;
+            font-size: 16px;
+            font-weight: 500;
+        }
+        
+        /* Smooth page transitions */
+        .main-content {
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        
+        /* Loading state for main content */
+        .main-content.loading {
+            opacity: 0.7;
+            pointer-events: none;
+        }
+
         @media (min-width: 769px) {
             .mobile-toggle {
                 display: none;
@@ -670,36 +840,35 @@ requireLogin();
                 <a href="dashboard.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'dashboard.php' ? 'active' : ''; ?>">
                     <i class='bx bx-tachometer nav-icon'></i>
                     <span class="nav-text">Dashboard</span>
+                    <div class="nav-tooltip">Dashboard</div>
                 </a>
             </div>
             <div class="nav-item">
                 <a href="products.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'products.php' ? 'active' : ''; ?>">
                     <i class='bx bx-package nav-icon'></i>
                     <span class="nav-text">Products</span>
+                    <div class="nav-tooltip">Products</div>
                 </a>
             </div>
             <div class="nav-item">
                 <a href="sales.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'sales.php' ? 'active' : ''; ?>">
                     <i class='bx bx-cart-alt nav-icon'></i>
                     <span class="nav-text">Sales</span>
+                    <div class="nav-tooltip">Sales</div>
                 </a>
             </div>
             <div class="nav-item">
                 <a href="reports.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'reports.php' ? 'active' : ''; ?>">
                     <i class='bx bx-bar-chart-alt-2 nav-icon'></i>
                     <span class="nav-text">Reports</span>
+                    <div class="nav-tooltip">Reports</div>
                 </a>
             </div>
             <div class="nav-item">
                 <a href="my_activity.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'my_activity.php' ? 'active' : ''; ?>">
                     <i class='bx bx-time-five nav-icon'></i>
                     <span class="nav-text">My Activity</span>
-                </a>
-            </div>
-            <div class="nav-item">
-                <a href="#" class="nav-link" onclick="toggleTheme(); return false;">
-                    <i class='bx bx-moon nav-icon' id="theme-icon"></i>
-                    <span class="nav-text">Dark Mode</span>
+                    <div class="nav-tooltip">My Activity</div>
                 </a>
             </div>
             <?php if (isAdmin()): ?>
@@ -707,6 +876,7 @@ requireLogin();
                 <a href="users.php" class="nav-link <?php echo basename($_SERVER['PHP_SELF']) == 'users.php' ? 'active' : ''; ?>">
                     <i class='bx bx-user-circle nav-icon'></i>
                     <span class="nav-text">Users</span>
+                    <div class="nav-tooltip">Users</div>
                 </a>
             </div>
             <?php endif; ?>
@@ -744,11 +914,7 @@ requireLogin();
                             <i class='bx bx-user-circle me-2'></i>My Profile
                         </a>
                     </li>
-                    <li>
-                        <a class="dropdown-item" href="my_activity.php">
-                            <i class='bx bx-list-ul me-2'></i>My Activity
-                        </a>
-                    </li>
+                  
                     <li>
                         <a class="dropdown-item" href="logout.php">
                             <i class='bx bx-log-out me-2'></i>Logout
@@ -758,6 +924,11 @@ requireLogin();
             </div>
         </div>
     </div>
+    
+    <!-- Floating Theme Toggle Button -->
+    <button class="theme-toggle" onclick="toggleTheme()" title="Toggle Dark Mode">
+        <i class='bx bx-moon' id="theme-icon"></i>
+    </button>
     
     <!-- Main Content -->
     <div class="main-content" id="main-content">

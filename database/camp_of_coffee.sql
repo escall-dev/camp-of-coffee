@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Sep 16, 2025 at 08:40 PM
+-- Generation Time: Sep 29, 2025 at 04:35 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -46,7 +46,27 @@ INSERT INTO `activity_logs` (`id`, `user_id`, `action`, `details`, `created_at`)
 (4, 3, 'login', 'User logged in', '2025-09-16 18:31:32'),
 (5, 3, 'login', 'User logged in', '2025-09-16 18:32:21'),
 (6, 4, 'login', 'User logged in', '2025-09-16 18:33:52'),
-(7, 3, 'login', 'User logged in', '2025-09-16 18:34:11');
+(7, 3, 'login', 'User logged in', '2025-09-16 18:34:11'),
+(8, 3, 'login', 'User logged in', '2025-09-16 19:13:52'),
+(9, 4, 'login', 'User logged in', '2025-09-16 19:14:43'),
+(10, 3, 'login', 'User logged in', '2025-09-16 19:17:18'),
+(11, 3, 'login', 'User logged in', '2025-09-17 08:27:50'),
+(12, 3, 'sale', 'Created sale #12 total ₱160.00', '2025-09-17 08:30:03'),
+(13, 4, 'login', 'User logged in', '2025-09-17 10:20:43'),
+(14, 3, 'login', 'User logged in', '2025-09-17 10:23:10'),
+(15, 3, 'login', 'User logged in', '2025-09-17 10:27:03'),
+(16, 3, 'login', 'User logged in', '2025-09-17 11:42:16'),
+(17, 3, 'login', 'User logged in', '2025-09-17 11:43:38'),
+(18, 3, 'login', 'User logged in', '2025-09-18 00:35:52'),
+(19, 3, 'sale', 'Created sale #13 total ₱100.00', '2025-09-18 00:36:13'),
+(20, 3, 'sale', 'Created sale #14 total ₱305.00', '2025-09-18 00:37:40'),
+(21, 3, 'sale', 'Created sale #15 total ₱120.00', '2025-09-18 00:40:12'),
+(22, 3, 'sale', 'Created sale #16 total ₱660.00', '2025-09-18 00:42:21'),
+(23, 4, 'login', 'User logged in', '2025-09-18 00:43:57'),
+(24, 3, 'login', 'User logged in', '2025-09-18 00:44:36'),
+(25, 5, 'login', 'User logged in', '2025-09-18 00:45:02'),
+(26, 3, 'login', 'User logged in', '2025-09-28 08:06:45'),
+(27, 3, 'login', 'User logged in', '2025-09-29 12:54:27');
 
 -- --------------------------------------------------------
 
@@ -69,21 +89,21 @@ CREATE TABLE `products` (
 --
 
 INSERT INTO `products` (`id`, `name`, `category`, `price`, `stock`, `created_at`, `updated_at`) VALUES
-(1, 'Americano', 'Coffee', 25.00, 96, '2025-09-16 16:41:36', '2025-09-16 18:13:51'),
-(2, 'Cappuccino', 'Coffee', 35.00, 96, '2025-09-16 16:41:36', '2025-09-16 17:08:16'),
+(1, 'Americano', 'Coffee', 25.00, 95, '2025-09-16 16:41:36', '2025-09-18 00:42:21'),
+(2, 'Cappuccino', 'Coffee', 35.00, 93, '2025-09-16 16:41:36', '2025-09-18 00:42:21'),
 (3, 'Latte', 'Coffee', 40.00, 99, '2025-09-16 16:41:36', '2025-09-16 17:32:14'),
-(4, 'Espresso', 'Coffee', 30.00, 97, '2025-09-16 16:41:36', '2025-09-16 17:33:12'),
+(4, 'Espresso', 'Coffee', 30.00, 95, '2025-09-16 16:41:36', '2025-09-17 08:30:03'),
 (5, 'Mocha', 'Coffee', 45.00, 100, '2025-09-16 16:41:36', '2025-09-16 16:41:36'),
 (6, 'Matcha Latte', 'Non-Coffee', 45.00, 48, '2025-09-16 16:41:36', '2025-09-16 17:43:28'),
 (7, 'Strawberry Smoothie', 'Non-Coffee', 50.00, 48, '2025-09-16 16:41:36', '2025-09-16 17:43:28'),
 (8, 'Chocolate Cake', 'Dessert', 60.00, 28, '2025-09-16 16:41:36', '2025-09-16 18:13:51'),
-(9, 'Cheesecake', 'Dessert', 65.00, 25, '2025-09-16 16:41:36', '2025-09-16 18:13:51'),
+(9, 'Cheesecake', 'Dessert', 65.00, 22, '2025-09-16 16:41:36', '2025-09-18 00:37:40'),
 (10, 'Croissant', 'Pastry', 35.00, 36, '2025-09-16 16:41:36', '2025-09-16 18:17:21'),
-(11, 'Camper\'s Cup', 'Coffee', 120.00, 18, '2025-09-16 17:44:15', '2025-09-16 18:13:51'),
+(11, 'Camper\'s Cup', 'Coffee', 120.00, 16, '2025-09-16 17:44:15', '2025-09-18 00:42:21'),
 (12, 'Hiker\'s Cup', 'Coffee', 120.00, 20, '2025-09-16 17:44:44', '2025-09-16 17:45:27'),
 (13, 'Explorer\'s Cup', 'Coffee', 120.00, 21, '2025-09-16 17:45:21', '2025-09-16 17:45:21'),
 (14, 'Caramel Macchiato', 'Coffee', 120.00, 27, '2025-09-16 17:46:14', '2025-09-16 17:46:14'),
-(15, 'Caramilk', 'Coffee', 120.00, 76, '2025-09-16 18:18:16', '2025-09-16 18:18:16'),
+(15, 'Caramilk', 'Coffee', 120.00, 73, '2025-09-16 18:18:16', '2025-09-18 00:42:21'),
 (16, 'Vanilla Latte', 'Coffee', 110.00, 22, '2025-09-16 18:18:49', '2025-09-16 18:18:49');
 
 -- --------------------------------------------------------
@@ -115,7 +135,12 @@ INSERT INTO `sales` (`id`, `sale_date`, `total_amount`, `cashier_id`, `created_a
 (8, '2025-09-17 01:43:28', 145.00, NULL, '2025-09-16 17:43:28'),
 (9, '2025-09-17 01:48:27', 25.00, NULL, '2025-09-16 17:48:27'),
 (10, '2025-09-17 02:13:51', 390.00, 3, '2025-09-16 18:13:51'),
-(11, '2025-09-17 02:17:21', 105.00, 3, '2025-09-16 18:17:21');
+(11, '2025-09-17 02:17:21', 105.00, 3, '2025-09-16 18:17:21'),
+(12, '2025-09-17 16:30:03', 160.00, 3, '2025-09-17 08:30:03'),
+(13, '2025-09-18 08:36:13', 100.00, 3, '2025-09-18 00:36:13'),
+(14, '2025-09-18 08:37:40', 305.00, 3, '2025-09-18 00:37:40'),
+(15, '2025-09-18 08:40:12', 120.00, 3, '2025-09-18 00:40:12'),
+(16, '2025-09-18 08:42:21', 660.00, 3, '2025-09-18 00:42:21');
 
 -- --------------------------------------------------------
 
@@ -163,7 +188,20 @@ INSERT INTO `sale_items` (`id`, `sale_id`, `product_id`, `quantity`, `price`, `s
 (23, 10, 9, 1, 65.00, 65.00, '2025-09-16 18:13:51'),
 (24, 10, 1, 1, 25.00, 25.00, '2025-09-16 18:13:51'),
 (25, 10, 8, 1, 60.00, 60.00, '2025-09-16 18:13:51'),
-(26, 11, 10, 3, 35.00, 105.00, '2025-09-16 18:17:21');
+(26, 11, 10, 3, 35.00, 105.00, '2025-09-16 18:17:21'),
+(27, 12, 9, 1, 65.00, 65.00, '2025-09-17 08:30:03'),
+(28, 12, 2, 1, 35.00, 35.00, '2025-09-17 08:30:03'),
+(29, 12, 4, 2, 30.00, 60.00, '2025-09-17 08:30:03'),
+(30, 13, 9, 1, 65.00, 65.00, '2025-09-18 00:36:13'),
+(31, 13, 2, 1, 35.00, 35.00, '2025-09-18 00:36:13'),
+(32, 14, 11, 1, 120.00, 120.00, '2025-09-18 00:37:40'),
+(33, 14, 9, 1, 65.00, 65.00, '2025-09-18 00:37:40'),
+(34, 14, 15, 1, 120.00, 120.00, '2025-09-18 00:37:40'),
+(35, 15, 11, 1, 120.00, 120.00, '2025-09-18 00:40:12'),
+(36, 16, 11, 3, 120.00, 360.00, '2025-09-18 00:42:21'),
+(37, 16, 2, 1, 35.00, 35.00, '2025-09-18 00:42:21'),
+(38, 16, 1, 1, 25.00, 25.00, '2025-09-18 00:42:21'),
+(39, 16, 15, 2, 120.00, 240.00, '2025-09-18 00:42:21');
 
 -- --------------------------------------------------------
 
@@ -189,8 +227,9 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `username`, `password_hash`, `role`, `full_name`, `email`, `phone`, `profile_image`, `created_at`, `updated_at`) VALUES
-(3, 'escall', '$2y$10$lcX/w2rlrOO5o2Bwrrttwec2vVo9QozcOMV7b8lMWgTYAYC.1ZQmm', 'admin', '', '', '', NULL, '2025-09-16 17:58:13', '2025-09-16 18:03:44'),
-(4, 'alex', '$2y$10$DeSoaIbiOyhkAVxhmwhVk.jYsZUc049SPBmypOE7vn4Wv/Tl8thDi', 'cashier', '', '', '', NULL, '2025-09-16 18:04:07', '2025-09-16 18:05:09');
+(3, 'escall', '$2y$10$lcX/w2rlrOO5o2Bwrrttwec2vVo9QozcOMV7b8lMWgTYAYC.1ZQmm', 'admin', '', '', '', 'uploads/profiles/profile_3_1758109353.jpg', '2025-09-16 17:58:13', '2025-09-17 11:42:33'),
+(4, 'alex', '$2y$10$DeSoaIbiOyhkAVxhmwhVk.jYsZUc049SPBmypOE7vn4Wv/Tl8thDi', 'cashier', '', '', '', NULL, '2025-09-16 18:04:07', '2025-09-16 18:05:09'),
+(5, 'kenneth', '$2y$10$tS5CBh00VHebqIiPCSjLguNwPRm/QRXHcsaUUMOeOBnHjvJva6S0q', 'admin', '', '', '', 'uploads/profiles/profile_5_1758156316.jpg', '2025-09-18 00:44:52', '2025-09-18 00:45:16');
 
 --
 -- Indexes for dumped tables
@@ -239,7 +278,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `activity_logs`
 --
 ALTER TABLE `activity_logs`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=28;
 
 --
 -- AUTO_INCREMENT for table `products`
@@ -251,19 +290,19 @@ ALTER TABLE `products`
 -- AUTO_INCREMENT for table `sales`
 --
 ALTER TABLE `sales`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=12;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=17;
 
 --
 -- AUTO_INCREMENT for table `sale_items`
 --
 ALTER TABLE `sale_items`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=27;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=40;
 
 --
 -- AUTO_INCREMENT for table `users`
 --
 ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- Constraints for dumped tables
