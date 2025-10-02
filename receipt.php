@@ -4,10 +4,71 @@ requireLogin();
 require_once 'includes/sales.php';
 
 $saleId = intval($_GET['id'] ?? 0);
+$isModal = isset($_GET['modal']) && $_GET['modal'] === 'true';
 $sale = $saleId ? getSaleById($saleId) : null;
+
 if (!$sale) {
-	echo '<p style="font-family:Arial;padding:20px">Receipt not found.</p>';
-	exit;
+    if ($isModal) {
+        echo '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Receipt not found.</div>';
+    } else {
+        echo '<p style="font-family:Arial;padding:20px">Receipt not found.</p>';
+    }
+    exit;
+}
+
+// If modal request, return just the receipt content
+if ($isModal) {
+    ?>
+    <div class="receipt-modal-content" style="background: white; padding: 20px; border-radius: 8px; max-width: 400px; margin: 0 auto; font-family: Arial, sans-serif; color: #333;">
+        <div class="receipt-header" style="text-align: center; margin-bottom: 20px;">
+            <?php if (file_exists('assets/images/coc_logo.jpg')): ?>
+                <img src="assets/images/coc_logo.jpg" alt="Camp Of Coffee" style="width: 64px; height: 64px; object-fit: cover; border-radius: 50%; margin-bottom: 10px;">
+            <?php endif; ?>
+            <div style="font-weight: bold; font-size: 18px; margin-bottom: 8px; color: #333;">Camp Of Coffee</div>
+            <div style="font-size: 12px; color: #666; margin-bottom: 4px;">
+                Receipt #: <?php echo $sale['id']; ?> · 
+                Date: <?php echo date('M d, Y h:i A', strtotime($sale['sale_date'])); ?>
+            </div>
+            <div style="font-size: 12px; color: #666;">Cashier: <?php echo htmlspecialchars($sale['username'] ?? ''); ?></div>
+        </div>
+
+        <div style="border-top: 1px dashed #ccc; border-bottom: 1px dashed #ccc; padding: 8px 0; margin: 15px 0; text-align: center;">
+            <h1 style="font-size: 16px; margin: 0; font-weight: bold; color: #333;">Items</h1>
+        </div>
+
+        <table style="width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 15px;">
+            <thead>
+                <tr>
+                    <th style="padding: 6px 4px; text-align: left; font-weight: bold; color: #333;">Product</th>
+                    <th style="padding: 6px 4px; text-align: center; font-weight: bold; color: #333;">Qty</th>
+                    <th style="padding: 6px 4px; text-align: right; font-weight: bold; color: #333;">Price</th>
+                    <th style="padding: 6px 4px; text-align: right; font-weight: bold; color: #333;">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($sale['items'] as $it): ?>
+                <tr>
+                    <td style="padding: 6px 4px; text-align: left; color: #333;"><?php echo htmlspecialchars($it['product_name']); ?></td>
+                    <td style="padding: 6px 4px; text-align: center; color: #333;"><?php echo (int)$it['quantity']; ?></td>
+                    <td style="padding: 6px 4px; text-align: right; color: #333;">₱<?php echo number_format($it['price'], 2); ?></td>
+                    <td style="padding: 6px 4px; text-align: right; color: #333;">₱<?php echo number_format($it['subtotal'], 2); ?></td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+                <tr style="border-top: 1px dashed #ccc;">
+                    <td colspan="3" style="padding: 6px 4px; text-align: right; font-weight: bold; color: #333;">Total</td>
+                    <td style="padding: 6px 4px; text-align: right; font-weight: bold; color: #333;">₱<?php echo number_format($sale['total_amount'], 2); ?></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div style="text-align: center; margin-top: 15px; font-size: 12px; color: #666;">
+            Thank you and enjoy your coffee!
+        </div>
+    </div>
+    <?php
+    exit;
 }
 ?>
 <!DOCTYPE html>

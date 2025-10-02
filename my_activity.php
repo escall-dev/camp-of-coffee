@@ -20,7 +20,7 @@ $logs = getMyActivity(getCurrentUserId(), 200);
             <p class="text-center text-muted mb-0">No activity yet.</p>
         <?php else: ?>
         <div class="table-responsive">
-            <table class="table table-hover">
+            <table class="table table-hover datatable">
                 <thead>
                     <tr>
                         <th>Action</th>

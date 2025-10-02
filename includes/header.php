@@ -483,6 +483,24 @@ requireLogin();
             border-top: 1px solid var(--border-color);
         }
         
+        /* Modal close button dark mode support */
+        .btn-close {
+            filter: invert(1) grayscale(100%) brightness(200%);
+        }
+        
+        .btn-close:hover {
+            filter: invert(1) grayscale(100%) brightness(300%);
+        }
+        
+        .btn-close:focus {
+            box-shadow: 0 0 0 0.25rem rgba(255, 255, 255, 0.25);
+        }
+        
+        /* Remove modal backdrop completely */
+        .modal-backdrop {
+            display: none !important;
+        }
+        
         .form-control, .form-select {
             background-color: var(--card-bg);
             color: var(--text-color);
@@ -523,8 +541,12 @@ requireLogin();
             border: 1px solid var(--border-color);
         }
         
-        /* DataTables Dark Mode Support - Force Override */
-        [data-theme="dark"] .dataTables_wrapper,
+        /* Enhanced DataTables Dark Mode Support */
+        [data-theme="dark"] .dataTables_wrapper {
+            background-color: transparent !important;
+            color: var(--text-color) !important;
+        }
+        
         [data-theme="dark"] .dataTables_wrapper * {
             color: var(--text-color) !important;
         }
@@ -534,34 +556,82 @@ requireLogin();
             background-color: transparent !important;
         }
         
+        /* DataTables controls styling */
         [data-theme="dark"] .dataTables_length,
         [data-theme="dark"] .dataTables_filter,
         [data-theme="dark"] .dataTables_info,
         [data-theme="dark"] .dataTables_paginate {
-            color: var(--text-color);
+            background-color: transparent !important;
+            color: var(--text-color) !important;
+        }
+        
+        [data-theme="dark"] .dataTables_length label,
+        [data-theme="dark"] .dataTables_filter label {
+            color: var(--text-color) !important;
+            font-weight: 500 !important;
         }
         
         [data-theme="dark"] .dataTables_length select,
         [data-theme="dark"] .dataTables_filter input {
-            background-color: var(--card-bg);
-            color: var(--text-color);
-            border: 1px solid var(--border-color);
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 6px !important;
         }
         
+        [data-theme="dark"] .dataTables_length select:focus,
+        [data-theme="dark"] .dataTables_filter input:focus {
+            border-color: var(--coffee-primary) !important;
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25) !important;
+        }
+        
+        /* Enhanced pagination buttons for dark mode */
         [data-theme="dark"] .paginate_button {
             background-color: var(--card-bg) !important;
             color: var(--text-color) !important;
             border: 1px solid var(--border-color) !important;
+            border-radius: 6px !important;
+            margin: 0 2px !important;
+            transition: all 0.3s ease !important;
         }
         
         [data-theme="dark"] .paginate_button:hover {
             background-color: var(--table-hover) !important;
             color: var(--text-color) !important;
+            border-color: var(--coffee-primary) !important;
+            transform: translateY(-1px) !important;
         }
         
-        [data-theme="dark"] .paginate_button.current {
+        [data-theme="dark"] .paginate_button.current,
+        [data-theme="dark"] .paginate_button.current:hover {
             background-color: var(--coffee-primary) !important;
             color: white !important;
+            border-color: var(--coffee-primary) !important;
+            box-shadow: 0 2px 4px rgba(139, 69, 19, 0.3) !important;
+        }
+        
+        [data-theme="dark"] .paginate_button.disabled,
+        [data-theme="dark"] .paginate_button.disabled:hover {
+            background-color: var(--card-bg) !important;
+            color: var(--text-muted) !important;
+            border-color: var(--border-color) !important;
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+        }
+        
+        /* DataTables info text */
+        [data-theme="dark"] .dataTables_info {
+            color: var(--text-muted) !important;
+            font-size: 14px !important;
+        }
+        
+        /* DataTables processing overlay */
+        [data-theme="dark"] .dataTables_processing {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px var(--shadow) !important;
         }
         
         [data-theme="dark"] .dataTables_wrapper .dataTables_length,
@@ -643,6 +713,277 @@ requireLogin();
         /* Fix pagination wrapper background */
         [data-theme="dark"] .dataTables_wrapper .dataTables_paginate {
             background-color: transparent !important;
+        }
+        
+        /* Enhanced DataTables pagination styling for both themes */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-color) !important;
+            margin: 0 2px !important;
+            border-radius: 6px !important;
+            transition: all 0.3s ease !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--table-hover) !important;
+            color: var(--text-color) !important;
+            border-color: var(--coffee-primary) !important;
+            transform: translateY(-1px) !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: var(--coffee-primary) !important;
+            border: 1px solid var(--coffee-primary) !important;
+            color: white !important;
+            box-shadow: 0 2px 4px rgba(139, 69, 19, 0.3) !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled,
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            background: var(--card-bg) !important;
+            color: var(--text-muted) !important;
+            border-color: var(--border-color) !important;
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+        }
+        
+        /* DataTables length and filter controls */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter {
+            background-color: transparent !important;
+            margin-bottom: 15px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_length label,
+        .dataTables_wrapper .dataTables_filter label {
+            color: var(--text-color) !important;
+            font-weight: 500 !important;
+        }
+        
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+            margin: 0 5px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_length select:focus,
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: var(--coffee-primary) !important;
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25) !important;
+        }
+        
+        /* DataTables info */
+        .dataTables_wrapper .dataTables_info {
+            color: var(--text-muted) !important;
+            font-size: 14px !important;
+            margin-top: 10px !important;
+        }
+        
+        /* DataTables processing overlay */
+        .dataTables_processing {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 8px !important;
+            box-shadow: 0 4px 6px var(--shadow) !important;
+        }
+        
+        /* Additional DataTables visibility fixes */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate {
+            background-color: transparent !important;
+            color: var(--text-color) !important;
+        }
+        
+        /* Ensure all DataTables elements are visible */
+        .dataTables_wrapper {
+            background-color: transparent !important;
+            color: var(--text-color) !important;
+        }
+        
+        .dataTables_wrapper * {
+            color: inherit !important;
+        }
+        
+        /* Force visibility for all DataTables components */
+        .dataTables_wrapper .dataTables_length label,
+        .dataTables_wrapper .dataTables_filter label {
+            color: var(--text-color) !important;
+            font-weight: 500 !important;
+        }
+        
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            background-color: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_length select:focus,
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: var(--coffee-primary) !important;
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25) !important;
+            outline: none !important;
+        }
+        
+        .dataTables_wrapper .dataTables_info {
+            color: var(--text-muted) !important;
+            font-size: 14px !important;
+        }
+        
+        /* Force DataTables pagination styling - More aggressive approach */
+        .dataTables_wrapper .dataTables_paginate .paginate_button {
+            background: var(--card-bg) !important;
+            border: 1px solid var(--border-color) !important;
+            color: var(--text-color) !important;
+            margin: 0 2px !important;
+            border-radius: 6px !important;
+            transition: all 0.3s ease !important;
+            padding: 6px 12px !important;
+            display: inline-block !important;
+            text-decoration: none !important;
+            cursor: pointer !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button:hover {
+            background: var(--table-hover) !important;
+            color: var(--text-color) !important;
+            border-color: var(--coffee-primary) !important;
+            transform: translateY(-1px) !important;
+            text-decoration: none !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current {
+            background: var(--coffee-primary) !important;
+            color: white !important;
+            border-color: var(--coffee-primary) !important;
+            box-shadow: 0 2px 4px rgba(139, 69, 19, 0.3) !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.current:hover {
+            background: var(--coffee-primary) !important;
+            color: white !important;
+            border-color: var(--coffee-primary) !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled {
+            background: var(--card-bg) !important;
+            color: var(--text-muted) !important;
+            border-color: var(--border-color) !important;
+            opacity: 0.5 !important;
+            cursor: not-allowed !important;
+        }
+        
+        .dataTables_wrapper .dataTables_paginate .paginate_button.disabled:hover {
+            background: var(--card-bg) !important;
+            color: var(--text-muted) !important;
+            border-color: var(--border-color) !important;
+            transform: none !important;
+        }
+        
+        /* Force DataTables controls styling */
+        .dataTables_wrapper .dataTables_length select,
+        .dataTables_wrapper .dataTables_filter input {
+            background: var(--card-bg) !important;
+            color: var(--text-color) !important;
+            border: 1px solid var(--border-color) !important;
+            border-radius: 6px !important;
+            padding: 6px 12px !important;
+            font-size: 14px !important;
+        }
+        
+        .dataTables_wrapper .dataTables_length select:focus,
+        .dataTables_wrapper .dataTables_filter input:focus {
+            border-color: var(--coffee-primary) !important;
+            box-shadow: 0 0 0 0.2rem rgba(139, 69, 19, 0.25) !important;
+            outline: none !important;
+        }
+        
+        .dataTables_wrapper .dataTables_length label,
+        .dataTables_wrapper .dataTables_filter label {
+            color: var(--text-color) !important;
+            font-weight: 500 !important;
+            margin: 0 5px !important;
+        }
+        
+        /* Force DataTables table backgrounds to be transparent */
+        .dataTables_wrapper,
+        .dataTables_wrapper .dataTables_scroll,
+        .dataTables_wrapper .dataTables_scrollHead,
+        .dataTables_wrapper .dataTables_scrollHeadInner,
+        .dataTables_wrapper .dataTables_scrollBody,
+        .dataTables_wrapper .dataTables_scrollFoot,
+        .dataTables_wrapper .dataTables_scrollFootInner {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+        
+        /* Force table backgrounds */
+        .dataTables_wrapper table,
+        .dataTables_wrapper table.dataTable,
+        .dataTables_wrapper table.dataTable thead,
+        .dataTables_wrapper table.dataTable thead th,
+        .dataTables_wrapper table.dataTable tbody,
+        .dataTables_wrapper table.dataTable tbody tr,
+        .dataTables_wrapper table.dataTable tbody td {
+            background-color: transparent !important;
+            background: transparent !important;
+            color: var(--text-color) !important;
+        }
+        
+        /* Force wrapper backgrounds */
+        .dataTables_wrapper .dataTables_length,
+        .dataTables_wrapper .dataTables_filter,
+        .dataTables_wrapper .dataTables_info,
+        .dataTables_wrapper .dataTables_paginate,
+        .dataTables_wrapper .dataTables_processing {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+        
+        /* Force card backgrounds to be transparent for DataTables */
+        .card .dataTables_wrapper,
+        .card .dataTables_wrapper * {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+        
+        /* Override any white backgrounds */
+        .dataTables_wrapper * {
+            background-color: transparent !important;
+            background: transparent !important;
+        }
+        
+        /* Specific overrides for dark mode */
+        [data-theme="dark"] .dataTables_wrapper,
+        [data-theme="dark"] .dataTables_wrapper *,
+        [data-theme="dark"] .dataTables_wrapper table,
+        [data-theme="dark"] .dataTables_wrapper table.dataTable,
+        [data-theme="dark"] .dataTables_wrapper table.dataTable thead,
+        [data-theme="dark"] .dataTables_wrapper table.dataTable thead th,
+        [data-theme="dark"] .dataTables_wrapper table.dataTable tbody,
+        [data-theme="dark"] .dataTables_wrapper table.dataTable tbody tr,
+        [data-theme="dark"] .dataTables_wrapper table.dataTable tbody td {
+            background-color: transparent !important;
+            background: transparent !important;
+            color: var(--text-color) !important;
+        }
+        
+        /* Force card backgrounds in dark mode */
+        [data-theme="dark"] .card .dataTables_wrapper,
+        [data-theme="dark"] .card .dataTables_wrapper * {
+            background-color: transparent !important;
+            background: transparent !important;
         }
         
         /* Fix search and length controls background */

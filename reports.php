@@ -113,7 +113,7 @@ require_once 'includes/header.php';
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover" id="salesTable">
+            <table class="table table-hover datatable" id="salesTable">
                 <thead>
                     <tr>
                         <th>Sale ID</th>
@@ -159,7 +159,7 @@ require_once 'includes/header.php';
     </div>
     <div class="card-body">
         <div class="table-responsive">
-            <table class="table table-hover" id="productsTable">
+            <table class="table table-hover datatable" id="productsTable">
                 <thead>
                     <tr>
                         <th>Product</th>
@@ -221,12 +221,49 @@ function viewSaleDetails(saleId) {
 // Export to CSV
 function exportToCSV() {
     const table = document.getElementById('salesTable');
-    let csv = 'Sale ID,Date Time,Cashier,Amount\n';
+    let csv = 'Sale ID,Date,Cashier,Amount\n';
     
     const rows = table.querySelectorAll('tbody tr');
     rows.forEach(row => {
         const cells = row.querySelectorAll('td');
-        csv += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent}\n`;
+        if (cells.length >= 4) {
+            // Clean and format each cell
+            const saleId = cells[0].textContent.trim().replace('#', '');
+            const dateTime = cells[1].textContent.trim();
+            const cashier = cells[2].textContent.trim();
+            const amount = cells[3].textContent.trim().replace('₱', '').replace(',', '');
+            
+            // Format date to "Month Date, Year" format
+            let formattedDate = dateTime;
+            try {
+                // Try to parse the date and reformat it
+                const date = new Date(dateTime);
+                if (!isNaN(date.getTime())) {
+                    formattedDate = date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric'
+                    });
+                }
+            } catch (e) {
+                // If parsing fails, use original date
+                formattedDate = dateTime;
+            }
+            
+            // Ensure date is treated as text by Excel
+            formattedDate = `'${formattedDate}`;
+            
+            // Format amount with peso sign
+            const formattedAmount = `₱${amount}`;
+            
+            // Escape commas and quotes in data
+            const cleanSaleId = `"${saleId}"`;
+            const cleanDate = `"${formattedDate}"`;
+            const cleanCashier = `"${cashier}"`;
+            const cleanAmount = `"${formattedAmount}"`;
+            
+            csv += `${cleanSaleId},${cleanDate},${cleanCashier},${cleanAmount}\n`;
+        }
     });
     
     downloadCSV(csv, 'sales_report.csv');
@@ -240,7 +277,26 @@ function exportProductsToCSV() {
     const rows = table.querySelectorAll('tbody tr');
     rows.forEach(row => {
         const cells = row.querySelectorAll('td');
-        csv += `${cells[0].textContent},${cells[1].textContent},${cells[2].textContent},${cells[3].textContent},${cells[4].textContent}\n`;
+        if (cells.length >= 5) {
+            // Clean and format each cell
+            const product = cells[0].textContent.trim();
+            const category = cells[1].textContent.trim();
+            const unitsSold = cells[2].textContent.trim().replace(',', '');
+            const timesSold = cells[3].textContent.trim().replace(',', '');
+            const revenue = cells[4].textContent.trim().replace('₱', '').replace(',', '');
+            
+            // Format revenue with peso sign
+            const formattedRevenue = `₱${revenue}`;
+            
+            // Escape commas and quotes in data
+            const cleanProduct = `"${product}"`;
+            const cleanCategory = `"${category}"`;
+            const cleanUnitsSold = `"${unitsSold}"`;
+            const cleanTimesSold = `"${timesSold}"`;
+            const cleanRevenue = `"${formattedRevenue}"`;
+            
+            csv += `${cleanProduct},${cleanCategory},${cleanUnitsSold},${cleanTimesSold},${cleanRevenue}\n`;
+        }
     });
     
     downloadCSV(csv, 'products_report.csv');
@@ -248,7 +304,11 @@ function exportProductsToCSV() {
 
 // Download CSV helper
 function downloadCSV(csv, filename) {
-    const blob = new Blob([csv], { type: 'text/csv' });
+    // Add BOM for proper UTF-8 encoding in Excel
+    const BOM = '\uFEFF';
+    const csvWithBOM = BOM + csv;
+    
+    const blob = new Blob([csvWithBOM], { type: 'text/csv;charset=utf-8;' });
     const url = window.URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
@@ -257,9 +317,138 @@ function downloadCSV(csv, filename) {
     window.URL.revokeObjectURL(url);
 }
 
-// Export to PDF (simplified version)
+// Export to PDF (table only, without Action column)
 function exportToPDF() {
-    window.print();
+    // Get the table element
+    const table = document.getElementById('salesTable');
+    if (!table) {
+        alert('Sales table not found');
+        return;
+    }
+    
+    // Clone the table and remove the Action column
+    const clonedTable = table.cloneNode(true);
+    const rows = clonedTable.querySelectorAll('tr');
+    
+    rows.forEach(row => {
+        const cells = row.querySelectorAll('td, th');
+        // Remove the last column (Action column)
+        if (cells.length > 4) {
+            cells[cells.length - 1].remove();
+        }
+    });
+    
+    // Create a new window with only the table (without Action column)
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`
+        <html>
+        <head>
+            <title>Sales Report - Camp Of Coffee</title>
+            <style>
+                body {
+                    font-family: Arial, sans-serif;
+                    margin: 20px;
+                    color: #333;
+                }
+                .header {
+                    text-align: center;
+                    margin-bottom: 30px;
+                    border-bottom: 2px solid #333;
+                    padding-bottom: 20px;
+                }
+                .logo-container {
+                    margin-bottom: 15px;
+                }
+                .company-logo {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    border: 2px solid #333;
+                }
+                .company-name {
+                    font-size: 24px;
+                    font-weight: bold;
+                    margin-bottom: 10px;
+                }
+                .report-title {
+                    font-size: 18px;
+                    color: #666;
+                    margin-bottom: 5px;
+                }
+                .report-date {
+                    font-size: 14px;
+                    color: #888;
+                }
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                    margin-top: 20px;
+                }
+                th, td {
+                    border: 1px solid #ddd;
+                    padding: 12px;
+                    text-align: left;
+                }
+                th {
+                    background-color: #f5f5f5;
+                    font-weight: bold;
+                    color: #333;
+                }
+                tr:nth-child(even) {
+                    background-color: #f9f9f9;
+                }
+                tr:hover {
+                    background-color: #f5f5f5;
+                }
+                .amount {
+                    text-align: right;
+                    font-weight: bold;
+                }
+                .footer {
+                    margin-top: 30px;
+                    text-align: center;
+                    font-size: 12px;
+                    color: #666;
+                    border-top: 1px solid #ddd;
+                    padding-top: 20px;
+                }
+                @media print {
+                    body { margin: 0; }
+                    .header { margin-bottom: 20px; }
+                }
+            </style>
+        </head>
+        <body>
+            <div class="header">
+                <div class="logo-container">
+                    <img src="assets/images/coc_logo.jpg" alt="Camp Of Coffee Logo" class="company-logo">
+                </div>
+                <div class="company-name">Camp Of Coffee</div>
+                <div class="report-title">Sales Report</div>
+                <div class="report-date">Generated on: ${new Date().toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                })}</div>
+            </div>
+            
+            ${clonedTable.outerHTML}
+            
+            <div class="footer">
+                <p>Thank you for using Camp Of Coffee Sales System</p>
+                <p>This report was generated automatically</p>
+            </div>
+        </body>
+        </html>
+    `);
+    printWindow.document.close();
+    printWindow.focus();
+    setTimeout(() => {
+        printWindow.print();
+    }, 500);
 }
 </script>
 

@@ -173,13 +173,14 @@ require_once 'includes/header.php';
                     </div>
                     <div class="mb-3">
                         <label for="category" class="form-label">Category</label>
-                        <input type="text" class="form-control" id="category" name="category" 
-                               list="categoryList" required>
-                        <datalist id="categoryList">
+                        <select class="form-select" id="category" name="category" required>
+                            <option value="" disabled selected>Select a category</option>
                             <?php foreach ($categories as $cat): ?>
                             <option value="<?php echo htmlspecialchars($cat); ?>">
+                                <?php echo htmlspecialchars($cat); ?>
+                            </option>
                             <?php endforeach; ?>
-                        </datalist>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="price" class="form-label">Price (₱)</label>
@@ -223,8 +224,14 @@ require_once 'includes/header.php';
                     </div>
                     <div class="mb-3">
                         <label for="edit_category" class="form-label">Category</label>
-                        <input type="text" class="form-control" id="edit_category" name="category" 
-                               list="categoryList" required>
+                        <select class="form-select" id="edit_category" name="category" required>
+                            <option value="" disabled>Select a category</option>
+                            <?php foreach ($categories as $cat): ?>
+                            <option value="<?php echo htmlspecialchars($cat); ?>">
+                                <?php echo htmlspecialchars($cat); ?>
+                            </option>
+                            <?php endforeach; ?>
+                        </select>
                     </div>
                     <div class="mb-3">
                         <label for="edit_price" class="form-label">Price (₱)</label>

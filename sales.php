@@ -25,6 +25,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['items'])) {
 
 // Get all products for POS
 $products = getAllProducts();
+$categories = getProductCategories();
 
 // NOW include header after all processing is done
 $pageTitle = 'Sales';
@@ -37,13 +38,6 @@ require_once 'includes/header.php';
             <i class="bi bi-cart-check me-2"></i>Point of Sale
         </h2>
     </div>
-    <?php if (!empty($_SESSION['last_sale_id'])): ?>
-    <div class="col-auto">
-        <a class="btn btn-outline-primary" href="receipt.php?id=<?php echo (int)$_SESSION['last_sale_id']; ?>" target="_blank">
-            <i class="bi bi-receipt me-1"></i> Print Receipt
-        </a>
-    </div>
-    <?php endif; ?>
 </div>
 
 <?php if (isset($_SESSION['success'])): ?>
@@ -77,28 +71,95 @@ require_once 'includes/header.php';
                            placeholder="Search products...">
                 </div>
                 
-                <div class="row" id="productGrid">
-                    <?php foreach ($products as $product): ?>
-                    <?php if ($product['stock'] > 0): ?>
-                    <div class="col-md-4 col-sm-6 mb-3 product-item" 
-                         data-name="<?php echo strtolower($product['name']); ?>"
-                         data-category="<?php echo strtolower($product['category']); ?>">
-                        <div class="card h-100 product-card" 
-                             onclick="addToCart(<?php echo htmlspecialchars(json_encode($product)); ?>)"
-                             style="cursor: pointer; transition: all 0.3s;">
-                            <div class="card-body text-center">
-                                <h6 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h6>
-                                <p class="text-muted mb-1">
-                                    <small><?php echo htmlspecialchars($product['category']); ?></small>
-                                </p>
-                                <p class="fw-bold mb-1">₱<?php echo number_format($product['price'], 2); ?></p>
-                                <p class="text-muted mb-0">
-                                    <small>Stock: <?php echo $product['stock']; ?></small>
-                                </p>
+                <!-- Category Tabs -->
+                <ul class="nav nav-tabs mb-3" id="categoryTabs" role="tablist">
+                    <li class="nav-item me-2" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="tab" 
+                                data-bs-target="#all" type="button" role="tab" aria-controls="all" 
+                                aria-selected="true">
+                            All Products 
+                            <span class="badge bg-secondary ms-1"><?php echo count(array_filter($products, function($p) { return $p['stock'] > 0; })); ?></span>
+                        </button>
+                    </li>
+                    <?php foreach ($categories as $category): ?>
+                    <?php 
+                    $categoryCount = count(array_filter($products, function($product) use ($category) {
+                        return $product['category'] === $category && $product['stock'] > 0;
+                    }));
+                    ?>
+                    <li class="nav-item me-2" role="presentation">
+                        <button class="nav-link" id="<?php echo strtolower(str_replace(' ', '-', $category)); ?>-tab" 
+                                data-bs-toggle="tab" data-bs-target="#<?php echo strtolower(str_replace(' ', '-', $category)); ?>" 
+                                type="button" role="tab" aria-controls="<?php echo strtolower(str_replace(' ', '-', $category)); ?>" 
+                                aria-selected="false">
+                            <?php echo htmlspecialchars($category); ?>
+                            <span class="badge bg-secondary ms-1"><?php echo $categoryCount; ?></span>
+                        </button>
+                    </li>
+                    <?php endforeach; ?>
+                </ul>
+                
+                <!-- Tab Content -->
+                <div class="tab-content" id="categoryTabContent">
+                    <!-- All Products Tab -->
+                    <div class="tab-pane fade show active" id="all" role="tabpanel" aria-labelledby="all-tab">
+                        <div class="row" id="productGrid">
+                            <?php foreach ($products as $product): ?>
+                            <?php if ($product['stock'] > 0): ?>
+                            <div class="col-md-4 col-sm-6 mb-3 product-item" 
+                                 data-name="<?php echo strtolower($product['name']); ?>"
+                                 data-category="<?php echo strtolower($product['category']); ?>">
+                                <div class="card h-100 product-card" 
+                                     onclick="addToCart(<?php echo htmlspecialchars(json_encode($product)); ?>)"
+                                     style="cursor: pointer; transition: all 0.3s;">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h6>
+                                        <p class="text-muted mb-1">
+                                            <small><?php echo htmlspecialchars($product['category']); ?></small>
+                                        </p>
+                                        <p class="fw-bold mb-1">₱<?php echo number_format($product['price'], 2); ?></p>
+                                        <p class="text-muted mb-0">
+                                            <small>Stock: <?php echo $product['stock']; ?></small>
+                                        </p>
+                                    </div>
+                                </div>
                             </div>
+                            <?php endif; ?>
+                            <?php endforeach; ?>
                         </div>
                     </div>
-                    <?php endif; ?>
+                    
+                    <!-- Category-specific tabs -->
+                    <?php foreach ($categories as $category): ?>
+                    <div class="tab-pane fade" id="<?php echo strtolower(str_replace(' ', '-', $category)); ?>" 
+                         role="tabpanel" aria-labelledby="<?php echo strtolower(str_replace(' ', '-', $category)); ?>-tab">
+                        <div class="row" id="productGrid-<?php echo strtolower(str_replace(' ', '-', $category)); ?>">
+                            <?php 
+                            $categoryProducts = array_filter($products, function($product) use ($category) {
+                                return $product['category'] === $category && $product['stock'] > 0;
+                            });
+                            foreach ($categoryProducts as $product): ?>
+                            <div class="col-md-4 col-sm-6 mb-3 product-item" 
+                                 data-name="<?php echo strtolower($product['name']); ?>"
+                                 data-category="<?php echo strtolower($product['category']); ?>">
+                                <div class="card h-100 product-card" 
+                                     onclick="addToCart(<?php echo htmlspecialchars(json_encode($product)); ?>)"
+                                     style="cursor: pointer; transition: all 0.3s;">
+                                    <div class="card-body text-center">
+                                        <h6 class="card-title"><?php echo htmlspecialchars($product['name']); ?></h6>
+                                        <p class="text-muted mb-1">
+                                            <small><?php echo htmlspecialchars($product['category']); ?></small>
+                                        </p>
+                                        <p class="fw-bold mb-1">₱<?php echo number_format($product['price'], 2); ?></p>
+                                        <p class="text-muted mb-0">
+                                            <small>Stock: <?php echo $product['stock']; ?></small>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            <?php endforeach; ?>
+                        </div>
+                    </div>
                     <?php endforeach; ?>
                 </div>
             </div>
@@ -205,7 +266,7 @@ require_once 'includes/header.php';
 </div>
 
 <!-- Processing Modal -->
-<div class="modal fade" id="processingModal" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1">
+<div class="modal fade" id="processingModal" tabindex="-1">
   <div class="modal-dialog modal-dialog-centered">
     <div class="modal-content">
       <div class="modal-body text-center py-4">
@@ -229,7 +290,26 @@ require_once 'includes/header.php';
         <p class="mb-0">Sale has been recorded successfully.</p>
       </div>
       <div class="modal-footer">
-        <a class="btn btn-primary" id="printReceiptBtn" target="_blank"><i class="bi bi-receipt me-1"></i>Print Receipt</a>
+        <button type="button" class="btn btn-primary" id="viewReceiptBtn"><i class="bi bi-receipt me-1"></i>View Receipt</button>
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Receipt Modal -->
+<div class="modal fade" id="receiptModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title"><i class="bi bi-receipt me-2"></i>Receipt</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body" id="receiptContent">
+        <!-- Receipt content will be loaded here -->
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-success" id="printReceiptBtn"><i class="bi bi-printer me-1"></i>Print</button>
         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
       </div>
     </div>
@@ -249,6 +329,66 @@ require_once 'includes/header.php';
 
 .cart-item:last-child {
     border-bottom: none;
+}
+
+/* Tab styling for light and dark mode visibility */
+.nav-tabs {
+    border-bottom: 2px solid var(--border-color);
+}
+
+.nav-tabs .nav-link {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    margin-right: 8px;
+    border-radius: 8px 8px 0 0;
+    transition: all 0.3s ease;
+}
+
+.nav-tabs .nav-link:hover {
+    background-color: var(--table-hover);
+    color: var(--text-color);
+    border-color: var(--coffee-primary);
+}
+
+.nav-tabs .nav-link.active {
+    background-color: var(--coffee-primary);
+    color: white;
+    border-color: var(--coffee-primary);
+    border-bottom-color: var(--card-bg);
+}
+
+.nav-tabs .nav-link.active .badge {
+    background-color: rgba(255, 255, 255, 0.2) !important;
+    color: white !important;
+}
+
+.nav-tabs .nav-link:not(.active) .badge {
+    background-color: var(--coffee-secondary) !important;
+    color: white !important;
+}
+
+/* Dark mode specific adjustments */
+[data-theme="dark"] .nav-tabs .nav-link {
+    background-color: var(--card-bg);
+    color: var(--text-color);
+    border-color: var(--border-color);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link:hover {
+    background-color: var(--table-hover);
+    border-color: var(--coffee-primary);
+}
+
+[data-theme="dark"] .nav-tabs .nav-link.active {
+    background-color: var(--coffee-primary);
+    color: white;
+    border-color: var(--coffee-primary);
+}
+
+[data-theme="dark"] .nav-tabs {
+    border-bottom-color: var(--border-color);
 }
 </style>
 
@@ -270,6 +410,12 @@ document.getElementById('searchProduct').addEventListener('input', function(e) {
             product.style.display = 'none';
         }
     });
+    
+    // If searching, show all products tab and hide others
+    if (searchTerm.length > 0) {
+        // Show all products tab
+        document.getElementById('all-tab').click();
+    }
 });
 
 // Add product to cart
@@ -398,12 +544,57 @@ function processSale() {
 // Show success modal on load if last_sale_id exists
 <?php if (!empty($_SESSION['last_sale_id'])): ?>
 window.addEventListener('DOMContentLoaded', () => {
-    const id = <?php echo (int)$_SESSION['last_sale_id']; ?>;
-    const btn = document.getElementById('printReceiptBtn');
-    btn.href = 'receipt.php?id=' + id;
+    const saleId = <?php echo (int)$_SESSION['last_sale_id']; ?>;
+    
+    // Set up view receipt button
+    document.getElementById('viewReceiptBtn').onclick = () => {
+        loadReceiptModal(saleId);
+    };
+    
+    // Set up print receipt button
+    document.getElementById('printReceiptBtn').onclick = () => {
+        window.open('receipt.php?id=' + saleId, '_blank');
+    };
+    
     new bootstrap.Modal(document.getElementById('successModal')).show();
 });
 <?php unset($_SESSION['last_sale_id']); endif; ?>
+
+// Function to load receipt in modal
+function loadReceiptModal(saleId) {
+    // Show loading state
+    document.getElementById('receiptContent').innerHTML = `
+        <div class="text-center py-4">
+            <div class="spinner-border text-primary mb-3" role="status"></div>
+            <div class="fw-semibold">Loading receipt...</div>
+        </div>
+    `;
+    
+    // Show receipt modal
+    const receiptModal = new bootstrap.Modal(document.getElementById('receiptModal'));
+    receiptModal.show();
+    
+    // Load receipt content
+    fetch(`receipt.php?id=${saleId}&modal=true`)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('receiptContent').innerHTML = html;
+            
+            // Set up print button
+            document.getElementById('printReceiptBtn').onclick = () => {
+                window.open(`receipt.php?id=${saleId}`, '_blank');
+            };
+        })
+        .catch(error => {
+            console.error('Error loading receipt:', error);
+            document.getElementById('receiptContent').innerHTML = `
+                <div class="alert alert-danger">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Error loading receipt. Please try again.
+                </div>
+            `;
+        });
+}
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
