@@ -621,6 +621,8 @@
             };
             
             // Function to load receipt in modal
+            // COMMENTED OUT - This function is defined in sales.php to avoid conflicts
+            /*
             window.loadReceiptModal = function(saleId) {
                 // Show loading state
                 document.getElementById('receiptContent').innerHTML = `
@@ -655,6 +657,7 @@
                         `;
                     });
             };
+            */
             
             window.updateCart = function() {
                 const cartDiv = document.getElementById('cartItems');
@@ -710,6 +713,8 @@
             };
             
             // Reinitialize print receipt function
+            // COMMENTED OUT - This function is defined in sales.php to avoid conflicts
+            /*
             window.loadReceiptModal = function(saleId) {
                 fetch(`receipt.php?id=${saleId}&modal=true`)
                     .then(response => response.text())
@@ -729,6 +734,7 @@
                         alert('Error loading receipt. Please try again.');
                     });
             };
+            */
             
             console.log('Sales page JavaScript reinitialized');
         }

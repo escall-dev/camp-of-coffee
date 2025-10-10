@@ -15,11 +15,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['items'])) {
         if ($result['success']) {
             $_SESSION['last_sale_id'] = $result['sale_id'];
             $_SESSION['success'] = 'Sale completed successfully! Sale ID: #' . $result['sale_id'];
+            error_log("Sale created successfully: ID = " . $result['sale_id']);
             header('Location: sales.php');
             exit();
         } else {
             $error = 'Failed to process sale: ' . $result['message'];
+            error_log("Sale creation failed: " . $result['message']);
         }
+    } else {
+        error_log("Sale creation failed: No items provided");
     }
 }
 
@@ -545,25 +549,61 @@ function processSale() {
 <?php if (!empty($_SESSION['last_sale_id'])): ?>
 window.addEventListener('DOMContentLoaded', () => {
     const saleId = <?php echo (int)$_SESSION['last_sale_id']; ?>;
+    console.log('Success modal: Sale ID =', saleId);
     
     // Set up view receipt button
-    document.getElementById('viewReceiptBtn').onclick = () => {
-        loadReceiptModal(saleId);
-    };
+    const viewReceiptBtn = document.getElementById('viewReceiptBtn');
+    if (viewReceiptBtn) {
+        viewReceiptBtn.onclick = () => {
+            console.log('View Receipt button clicked for sale ID:', saleId);
+            loadReceiptModal(saleId);
+        };
+    } else {
+        console.error('viewReceiptBtn not found');
+    }
     
     // Set up print receipt button
-    document.getElementById('printReceiptBtn').onclick = () => {
-        window.open('receipt.php?id=' + saleId, '_blank');
-    };
+    const printReceiptBtn = document.getElementById('printReceiptBtn');
+    if (printReceiptBtn) {
+        printReceiptBtn.onclick = () => {
+            console.log('Print Receipt button clicked for sale ID:', saleId);
+            window.open('receipt.php?id=' + saleId, '_blank');
+        };
+    }
     
-    new bootstrap.Modal(document.getElementById('successModal')).show();
+    // Show the success modal
+    const successModal = document.getElementById('successModal');
+    if (successModal) {
+        new bootstrap.Modal(successModal).show();
+        console.log('Success modal shown');
+    } else {
+        console.error('successModal not found');
+    }
 });
 <?php unset($_SESSION['last_sale_id']); endif; ?>
 
 // Function to load receipt in modal
 function loadReceiptModal(saleId) {
+    console.log('loadReceiptModal called with saleId:', saleId);
+    
+    // Check if required elements exist
+    const receiptContent = document.getElementById('receiptContent');
+    const receiptModal = document.getElementById('receiptModal');
+    
+    if (!receiptContent) {
+        console.error('receiptContent element not found');
+        alert('Error: Receipt modal content area not found');
+        return;
+    }
+    
+    if (!receiptModal) {
+        console.error('receiptModal element not found');
+        alert('Error: Receipt modal not found');
+        return;
+    }
+    
     // Show loading state
-    document.getElementById('receiptContent').innerHTML = `
+    receiptContent.innerHTML = `
         <div class="text-center py-4">
             <div class="spinner-border text-primary mb-3" role="status"></div>
             <div class="fw-semibold">Loading receipt...</div>
@@ -571,26 +611,40 @@ function loadReceiptModal(saleId) {
     `;
     
     // Show receipt modal
-    const receiptModal = new bootstrap.Modal(document.getElementById('receiptModal'));
-    receiptModal.show();
+    const modal = new bootstrap.Modal(receiptModal);
+    modal.show();
     
     // Load receipt content
-    fetch(`receipt.php?id=${saleId}&modal=true`)
-        .then(response => response.text())
+    const url = `receipt.php?id=${saleId}&modal=true`;
+    console.log('Fetching receipt from:', url);
+    
+    fetch(url)
+        .then(response => {
+            console.log('Receipt response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+            }
+            return response.text();
+        })
         .then(html => {
-            document.getElementById('receiptContent').innerHTML = html;
+            console.log('Receipt HTML received, length:', html.length);
+            receiptContent.innerHTML = html;
             
             // Set up print button
-            document.getElementById('printReceiptBtn').onclick = () => {
-                window.open(`receipt.php?id=${saleId}`, '_blank');
-            };
+            const printBtn = document.getElementById('printReceiptBtn');
+            if (printBtn) {
+                printBtn.onclick = () => {
+                    window.open(`receipt.php?id=${saleId}`, '_blank');
+                };
+            }
         })
         .catch(error => {
             console.error('Error loading receipt:', error);
-            document.getElementById('receiptContent').innerHTML = `
+            receiptContent.innerHTML = `
                 <div class="alert alert-danger">
                     <i class="bi bi-exclamation-triangle me-2"></i>
-                    Error loading receipt. Please try again.
+                    Error loading receipt: ${error.message}<br>
+                    <small>Sale ID: ${saleId}</small>
                 </div>
             `;
         });

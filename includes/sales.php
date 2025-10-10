@@ -60,6 +60,8 @@ function getSaleById($id) {
     global $pdo;
     
     try {
+        error_log("getSaleById: Looking for sale ID $id");
+        
         // Get sale info
         $stmt = $pdo->prepare("
             SELECT s.*, u.username 
@@ -71,6 +73,7 @@ function getSaleById($id) {
         $sale = $stmt->fetch();
         
         if ($sale) {
+            error_log("getSaleById: Sale found, getting items");
             // Get sale items
             $stmt = $pdo->prepare("
                 SELECT si.*, p.name as product_name 
@@ -80,6 +83,10 @@ function getSaleById($id) {
             ");
             $stmt->execute([$id]);
             $sale['items'] = $stmt->fetchAll();
+            
+            error_log("getSaleById: Found " . count($sale['items']) . " items for sale $id");
+        } else {
+            error_log("getSaleById: No sale found for ID $id");
         }
         
         return $sale;

@@ -5,16 +5,23 @@ require_once 'includes/sales.php';
 
 $saleId = intval($_GET['id'] ?? 0);
 $isModal = isset($_GET['modal']) && $_GET['modal'] === 'true';
+
+// Debug logging
+error_log("Receipt.php: Sale ID = $saleId, Modal = " . ($isModal ? 'true' : 'false'));
+
 $sale = $saleId ? getSaleById($saleId) : null;
 
 if (!$sale) {
+    error_log("Receipt.php: Sale not found for ID $saleId");
     if ($isModal) {
-        echo '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Receipt not found.</div>';
+        echo '<div class="alert alert-danger"><i class="bi bi-exclamation-triangle me-2"></i>Receipt not found for Sale ID: ' . $saleId . '</div>';
     } else {
-        echo '<p style="font-family:Arial;padding:20px">Receipt not found.</p>';
+        echo '<p style="font-family:Arial;padding:20px">Receipt not found for Sale ID: ' . $saleId . '</p>';
     }
     exit;
 }
+
+error_log("Receipt.php: Sale found, proceeding with receipt generation");
 
 // If modal request, return just the receipt content
 if ($isModal) {
