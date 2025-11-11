@@ -44,9 +44,15 @@ A comprehensive Sales and Inventory Tracking System built with PHP and MySQL for
    ```
 
 ## Default Login Credentials
+          ADMIN
+- **Username**: kenneth
+- **Password**: kenneth
 
-- **Username**: admin
-- **Password**: admin123
+         CASHIER
+- **Username**:wisdom
+- **Password**: wisdom
+
+
 
 ## Directory Structure
 
@@ -108,6 +114,10 @@ camp_of_coffee/
 2. Select date range
 3. View sales or product reports
 4. Export to CSV for further analysis
+
+## Credits
+This Project was created by Alexander Joerenz Escallente 
+September 2025
 
 ## License
 
