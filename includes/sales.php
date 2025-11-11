@@ -4,21 +4,24 @@ require_once __DIR__ . '/products.php';
 require_once __DIR__ . '/activity.php';
 
 // Create new sale
-function createSale($items, $cashierId) {
+function createSale($items, $cashierId, $discountType = null, $discountAmount = 0) {
     global $pdo;
     
     try {
         $pdo->beginTransaction();
         
-        // Calculate total amount
-        $totalAmount = 0;
+        // Calculate subtotal
+        $subtotal = 0;
         foreach ($items as $item) {
-            $totalAmount += $item['price'] * $item['quantity'];
+            $subtotal += $item['price'] * $item['quantity'];
         }
         
-        // Insert sale record
-        $stmt = $pdo->prepare("INSERT INTO sales (total_amount, cashier_id) VALUES (?, ?)");
-        $stmt->execute([$totalAmount, $cashierId]);
+        // Calculate total amount after discount
+        $totalAmount = $subtotal - $discountAmount;
+        
+        // Insert sale record with discount information
+        $stmt = $pdo->prepare("INSERT INTO sales (total_amount, discount_type, discount_amount, cashier_id) VALUES (?, ?, ?, ?)");
+        $stmt->execute([$totalAmount, $discountType, $discountAmount, $cashierId]);
         $saleId = $pdo->lastInsertId();
         
         // Insert sale items and update stock
@@ -45,7 +48,11 @@ function createSale($items, $cashierId) {
         
         $pdo->commit();
         // activity
-        logActivity($cashierId, 'sale', 'Created sale #' . $saleId . ' total ₱' . number_format($totalAmount, 2));
+        $activityMessage = 'Created sale #' . $saleId . ' total ₱' . number_format($totalAmount, 2);
+        if (!empty($discountType) && $discountAmount > 0) {
+            $activityMessage .= ' (Customer Discount 20%: -₱' . number_format($discountAmount, 2) . ')';
+        }
+        logActivity($cashierId, 'sale', $activityMessage);
         return ['success' => true, 'sale_id' => $saleId];
         
     } catch(Exception $e) {

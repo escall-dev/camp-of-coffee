@@ -149,27 +149,24 @@ if (!$sale) {
     text-align: right;
 }
 
-.receipt-total {
+.receipt-table tfoot td {
     border-top: 1px dashed #ccc;
-    padding-top: 10px;
-    margin-top: 10px;
     transition: border-color 0.3s ease;
 }
 
-[data-theme="dark"] .receipt-total {
+[data-theme="dark"] .receipt-table tfoot td {
     border-top: 1px dashed #4a5568;
 }
 
-.receipt-total-amount {
+.receipt-table tfoot tr:last-child td {
+    border-top: 1px dashed #ccc;
     font-size: 16px;
     font-weight: bold;
-    color: #333;
-    text-align: right;
-    transition: color 0.3s ease;
+    transition: border-color 0.3s ease;
 }
 
-[data-theme="dark"] .receipt-total-amount {
-    color: #e2e8f0;
+[data-theme="dark"] .receipt-table tfoot tr:last-child td {
+    border-top: 1px dashed #4a5568;
 }
 
 .receipt-footer {
@@ -182,6 +179,14 @@ if (!$sale) {
 
 [data-theme="dark"] .receipt-footer {
     color: #a0aec0;
+}
+
+.discount-row td {
+    color: #28a745 !important;
+}
+
+[data-theme="dark"] .discount-row td {
+    color: #48bb78 !important;
 }
 </style>
 
@@ -208,7 +213,11 @@ if (!$sale) {
             </tr>
         </thead>
         <tbody>
-            <?php foreach ($sale['items'] as $item): ?>
+            <?php 
+            $subtotal = 0;
+            foreach ($sale['items'] as $item): 
+                $subtotal += $item['subtotal'];
+            ?>
             <tr>
                 <td><?php echo htmlspecialchars($item['product_name']); ?></td>
                     <td><?php echo $item['quantity']; ?></td>
@@ -217,13 +226,35 @@ if (!$sale) {
             </tr>
             <?php endforeach; ?>
         </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="3" style="text-align: right; padding-top: 10px; border-top: 1px dashed #ccc;">
+                    <strong>Subtotal:</strong>
+                </td>
+                <td style="text-align: right; padding-top: 10px; border-top: 1px dashed #ccc;">
+                    <strong>₱<?php echo number_format($subtotal, 2); ?></strong>
+                </td>
+            </tr>
+            <?php if (!empty($sale['discount_type']) && $sale['discount_amount'] > 0): ?>
+            <tr class="discount-row">
+                <td colspan="3" style="text-align: right; color: #28a745; padding-top: 5px;">
+                    <strong>Customer Discount (20%):</strong>
+                </td>
+                <td style="text-align: right; color: #28a745; padding-top: 5px;">
+                    <strong>-₱<?php echo number_format($sale['discount_amount'], 2); ?></strong>
+                </td>
+            </tr>
+            <?php endif; ?>
+            <tr>
+                <td colspan="3" style="text-align: right; padding-top: 10px; border-top: 1px dashed #ccc;">
+                    <strong>Total:</strong>
+                </td>
+                <td style="text-align: right; padding-top: 10px; border-top: 1px dashed #ccc;">
+                    <strong>₱<?php echo number_format($sale['total_amount'], 2); ?></strong>
+                </td>
+            </tr>
+        </tfoot>
     </table>
-    </div>
-
-    <div class="receipt-total">
-        <div class="receipt-total-amount">
-            Total: ₱<?php echo number_format($sale['total_amount'], 2); ?>
-        </div>
     </div>
 
     <div class="receipt-footer">
@@ -273,8 +304,9 @@ function exportReceiptToPDF(saleId) {
                 .receipt-table td { padding: 6px 4px; color: #333; }
                 .receipt-table td:nth-child(2), .receipt-table td:nth-child(3) { text-align: center; }
                 .receipt-table td:nth-child(4) { text-align: right; }
-                .receipt-total { border-top: 1px dashed #ccc; padding-top: 10px; margin-top: 10px; }
-                .receipt-total-amount { font-size: 16px; font-weight: bold; color: #333; text-align: right; }
+                .receipt-table tfoot td { border-top: 1px dashed #ccc; }
+                .receipt-table tfoot tr:last-child td { border-top: 1px dashed #ccc; font-size: 16px; font-weight: bold; }
+                .discount-row td { color: #28a745 !important; }
                 .receipt-footer { text-align: center; margin-top: 20px; font-size: 12px; color: #666; }
                 @media print { body { margin: 0; } }
             </style>

@@ -10,11 +10,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['items'])) {
     $items = json_decode($_POST['items'], true);
     
     if (!empty($items)) {
-        $result = createSale($items, getCurrentUserId());
+        // Get discount information
+        $discountType = isset($_POST['discount_type']) && !empty($_POST['discount_type']) ? $_POST['discount_type'] : null;
+        $discountAmount = isset($_POST['discount_amount']) ? floatval($_POST['discount_amount']) : 0;
+        
+        error_log("POST data - discount_type: " . var_export($_POST['discount_type'] ?? 'NOT SET', true) . ", discount_amount: " . var_export($_POST['discount_amount'] ?? 'NOT SET', true));
+        error_log("Processed - Discount Type: " . var_export($discountType, true) . ", Discount Amount: " . $discountAmount);
+        
+        $result = createSale($items, getCurrentUserId(), $discountType, $discountAmount);
         
         if ($result['success']) {
             $_SESSION['last_sale_id'] = $result['sale_id'];
-            $_SESSION['success'] = 'Sale completed successfully! Sale ID: #' . $result['sale_id'];
+            $successMessage = 'Sale completed successfully! Sale ID: #' . $result['sale_id'];
+            if (!empty($discountType)) {
+                $successMessage .= ' (20% Customer Discount applied)';
+            }
+            $_SESSION['success'] = $successMessage;
             error_log("Sale created successfully: ID = " . $result['sale_id']);
             header('Location: sales.php');
             exit();
@@ -185,9 +196,28 @@ require_once 'includes/header.php';
                 
                 <hr>
                 
+                <!-- Discount Section -->
+                <div class="mb-3">
+                    <label class="form-label">
+                        <i class="bi bi-percent me-1"></i>Customer Discount
+                    </label>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="discountCheckbox">
+                        <label class="form-check-label" for="discountCheckbox">
+                            PWD / Senior Citizen (20% Off)
+                        </label>
+                    </div>
+                </div>
+                
+                <hr>
+                
                 <div class="d-flex justify-content-between mb-2">
                     <h6>Subtotal:</h6>
                     <h6 id="subtotal">₱0.00</h6>
+                </div>
+                <div class="d-flex justify-content-between mb-2" id="discountRow" style="display: none;">
+                    <h6 class="text-success">Discount (20%):</h6>
+                    <h6 class="text-success" id="discountAmount">-₱0.00</h6>
                 </div>
                 <div class="d-flex justify-content-between mb-3">
                     <h5>Total:</h5>
@@ -248,6 +278,8 @@ require_once 'includes/header.php';
 <!-- Hidden form for sale submission -->
 <form id="saleForm" method="POST" action="">
     <input type="hidden" name="items" id="saleItems">
+    <input type="hidden" name="discount_type" id="discountType">
+    <input type="hidden" name="discount_amount" id="discountAmountInput">
 </form>
 
 <!-- Confirm Modal -->
@@ -399,6 +431,21 @@ require_once 'includes/header.php';
 <script>
 let cart = [];
 
+// Initialize discount checkbox event listener when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    const discountCheckbox = document.getElementById('discountCheckbox');
+    if (discountCheckbox) {
+        // Add event listener for checkbox change - this fires when checkbox state changes
+        discountCheckbox.addEventListener('change', function(e) {
+            console.log('Discount checkbox changed! New state - Checked:', this.checked);
+            // Update cart to recalculate totals with discount
+            updateCart();
+        });
+    } else {
+        console.error('Discount checkbox not found!');
+    }
+});
+
 // Search products
 document.getElementById('searchProduct').addEventListener('input', function(e) {
     const searchTerm = e.target.value.toLowerCase();
@@ -477,56 +524,128 @@ function clearCart() {
 
 // Update cart display
 function updateCart() {
+    // Get all DOM elements - fetch fresh each time to ensure we have latest state
     const cartDiv = document.getElementById('cartItems');
     const clearBtn = document.getElementById('clearBtn');
     const checkoutBtn = document.getElementById('checkoutBtn');
+    const subtotalElem = document.getElementById('subtotal');
+    const totalElem = document.getElementById('total');
     
     if (cart.length === 0) {
         cartDiv.innerHTML = '<p class="text-center text-muted py-4">Cart is empty</p>';
         clearBtn.disabled = true;
         checkoutBtn.disabled = true;
-    } else {
-        let html = '';
-        let total = 0;
+        const discountRow = document.getElementById('discountRow');
+        const discountAmountElem = document.getElementById('discountAmount');
+        if (discountRow) {
+            discountRow.style.display = 'none';
+        }
+        // Reset all totals when cart is empty
+        if (subtotalElem) subtotalElem.textContent = '₱0.00';
+        if (totalElem) totalElem.textContent = '₱0.00';
+        if (discountAmountElem) discountAmountElem.textContent = '-₱0.00';
+        return;
+    }
+    
+    // Build cart items HTML
+    let html = '';
+    let subtotal = 0;
+    
+    cart.forEach(item => {
+        const itemSubtotal = item.price * item.quantity;
+        subtotal += itemSubtotal;
         
-        cart.forEach(item => {
-            const subtotal = item.price * item.quantity;
-            total += subtotal;
-            
-            html += `
-                <div class="cart-item">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <h6 class="mb-0">${item.name}</h6>
-                            <small class="text-muted">₱${item.price.toFixed(2)} each</small>
-                        </div>
-                        <div class="d-flex align-items-center">
-                            <input type="number" 
-                                   class="form-control form-control-sm me-2" 
-                                   style="width: 60px;"
-                                   id="qty_${item.product_id}"
-                                   value="${item.quantity}"
-                                   min="1"
-                                   max="${item.max_stock}"
-                                   onchange="updateQuantity(${item.product_id}, this.value)">
-                            <span class="me-2">₱${subtotal.toFixed(2)}</span>
-                            <button class="btn btn-sm btn-danger" 
-                                    onclick="removeFromCart(${item.product_id})">
-                                <i class="bi bi-trash"></i>
-                            </button>
-                        </div>
+        html += `
+            <div class="cart-item">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="mb-0">${item.name}</h6>
+                        <small class="text-muted">₱${item.price.toFixed(2)} each</small>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <input type="number" 
+                               class="form-control form-control-sm me-2" 
+                               style="width: 60px;"
+                               id="qty_${item.product_id}"
+                               value="${item.quantity}"
+                               min="1"
+                               max="${item.max_stock}"
+                               onchange="updateQuantity(${item.product_id}, this.value)">
+                        <span class="me-2">₱${itemSubtotal.toFixed(2)}</span>
+                        <button class="btn btn-sm btn-danger" 
+                                onclick="removeFromCart(${item.product_id})">
+                            <i class="bi bi-trash"></i>
+                        </button>
                     </div>
                 </div>
-            `;
-        });
-        
-        cartDiv.innerHTML = html;
-        document.getElementById('subtotal').textContent = '₱' + total.toFixed(2);
-        document.getElementById('total').textContent = '₱' + total.toFixed(2);
-        
-        clearBtn.disabled = false;
-        checkoutBtn.disabled = false;
+            </div>
+        `;
+    });
+    
+    // Update cart HTML
+    cartDiv.innerHTML = html;
+    
+    // Update subtotal
+    if (subtotalElem) {
+        subtotalElem.textContent = '₱' + subtotal.toFixed(2);
     }
+    
+    // Get discount checkbox state - fetch fresh to ensure we have latest state
+    const discountCheckbox = document.getElementById('discountCheckbox');
+    const discountRow = document.getElementById('discountRow');
+    const discountAmountElem = document.getElementById('discountAmount');
+    
+    // Calculate discount and total
+    let discount = 0;
+    let total = subtotal;
+    
+    // Check if discount checkbox is checked - ALWAYS get fresh state from DOM
+    let isDiscountChecked = false;
+    if (discountCheckbox) {
+        isDiscountChecked = discountCheckbox.checked === true;
+    }
+    
+    // Apply discount calculation
+    if (isDiscountChecked && subtotal > 0) {
+        // Calculate 20% discount
+        discount = subtotal * 0.20;
+        // Round to 2 decimal places to avoid floating point issues
+        discount = Math.round(discount * 100) / 100;
+        total = subtotal - discount;
+        // Round total to 2 decimal places
+        total = Math.round(total * 100) / 100;
+        
+        // Show discount row
+        if (discountRow) {
+            discountRow.style.display = 'flex';
+        }
+        // Update discount amount display
+        if (discountAmountElem) {
+            discountAmountElem.textContent = '-₱' + discount.toFixed(2);
+        }
+    } else {
+        // No discount applied
+        discount = 0;
+        total = subtotal;
+        
+        // Hide discount row
+        if (discountRow) {
+            discountRow.style.display = 'none';
+        }
+        // Reset discount amount display
+        if (discountAmountElem) {
+            discountAmountElem.textContent = '-₱0.00';
+        }
+    }
+    
+    // Update total display
+    if (totalElem) {
+        totalElem.textContent = '₱' + total.toFixed(2);
+    }
+    
+    // Enable buttons
+    clearBtn.disabled = false;
+    checkoutBtn.disabled = false;
 }
 
 // Process sale with Bootstrap modals
@@ -540,7 +659,27 @@ function processSale() {
     document.getElementById('confirmProcessBtn').onclick = () => {
         confirmModal.hide();
         new bootstrap.Modal(document.getElementById('processingModal')).show();
+        
+        // Set form values
         document.getElementById('saleItems').value = JSON.stringify(cart);
+        
+        // Set discount information
+        const discountCheckbox = document.getElementById('discountCheckbox');
+        if (discountCheckbox && discountCheckbox.checked) {
+            document.getElementById('discountType').value = 'Customer Discount';
+            
+            // Calculate discount amount
+            let subtotal = 0;
+            cart.forEach(item => {
+                subtotal += item.price * item.quantity;
+            });
+            const discountAmount = subtotal * 0.20;
+            document.getElementById('discountAmountInput').value = discountAmount.toFixed(2);
+        } else {
+            document.getElementById('discountType').value = '';
+            document.getElementById('discountAmountInput').value = '0';
+        }
+        
         document.getElementById('saleForm').submit();
     };
 }
@@ -652,3 +791,4 @@ function loadReceiptModal(saleId) {
 </script>
 
 <?php require_once 'includes/footer.php'; ?>
+// Cache buster: 1762880797

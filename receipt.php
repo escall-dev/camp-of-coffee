@@ -53,7 +53,11 @@ if ($isModal) {
                 </tr>
             </thead>
             <tbody>
-                <?php foreach ($sale['items'] as $it): ?>
+                <?php 
+                $subtotal = 0;
+                foreach ($sale['items'] as $it): 
+                    $subtotal += $it['subtotal'];
+                ?>
                 <tr>
                     <td style="padding: 6px 4px; text-align: left; color: #333;"><?php echo htmlspecialchars($it['product_name']); ?></td>
                     <td style="padding: 6px 4px; text-align: center; color: #333;"><?php echo (int)$it['quantity']; ?></td>
@@ -64,6 +68,20 @@ if ($isModal) {
             </tbody>
             <tfoot>
                 <tr style="border-top: 1px dashed #ccc;">
+                    <td colspan="3" style="padding: 6px 4px; text-align: right; color: #333;">Subtotal</td>
+                    <td style="padding: 6px 4px; text-align: right; color: #333;">₱<?php echo number_format($subtotal, 2); ?></td>
+                </tr>
+                <?php if (!empty($sale['discount_type']) && $sale['discount_amount'] > 0): ?>
+                <tr>
+                    <td colspan="3" style="padding: 6px 4px; text-align: right; color: #28a745;">
+                        Customer Discount (20%)
+                    </td>
+                    <td style="padding: 6px 4px; text-align: right; color: #28a745;">
+                        -₱<?php echo number_format($sale['discount_amount'], 2); ?>
+                    </td>
+                </tr>
+                <?php endif; ?>
+                <tr>
                     <td colspan="3" style="padding: 6px 4px; text-align: right; font-weight: bold; color: #333;">Total</td>
                     <td style="padding: 6px 4px; text-align: right; font-weight: bold; color: #333;">₱<?php echo number_format($sale['total_amount'], 2); ?></td>
                 </tr>
@@ -127,7 +145,11 @@ if ($isModal) {
 				</tr>
 			</thead>
 			<tbody>
-				<?php foreach ($sale['items'] as $it): ?>
+				<?php 
+				$printSubtotal = 0;
+				foreach ($sale['items'] as $it): 
+					$printSubtotal += $it['subtotal'];
+				?>
 				<tr>
 					<td><?php echo htmlspecialchars($it['product_name']); ?></td>
 					<td align="right"><?php echo (int)$it['quantity']; ?></td>
@@ -137,6 +159,20 @@ if ($isModal) {
 				<?php endforeach; ?>
 			</tbody>
 			<tfoot>
+				<tr>
+					<td colspan="3" align="right">Subtotal</td>
+					<td align="right">₱<?php echo number_format($printSubtotal, 2); ?></td>
+				</tr>
+				<?php if (!empty($sale['discount_type']) && $sale['discount_amount'] > 0): ?>
+				<tr>
+					<td colspan="3" align="right" style="color: #28a745;">
+						Customer Discount (20%)
+					</td>
+					<td align="right" style="color: #28a745;">
+						-₱<?php echo number_format($sale['discount_amount'], 2); ?>
+					</td>
+				</tr>
+				<?php endif; ?>
 				<tr>
 					<td colspan="3" align="right">Total</td>
 					<td align="right">₱<?php echo number_format($sale['total_amount'], 2); ?></td>
@@ -196,7 +232,13 @@ if ($isModal) {
 			const row = [cells[0].innerText, cells[1].innerText, cells[2].innerText.replace('₱',''), cells[3].innerText.replace('₱','')];
 			csv += row.join(',') + '\n';
 		});
-		csv += `Total,,,${document.querySelector('#itemsTable tfoot td:last-child').innerText.replace('₱','')}\n`;
+		// Add all footer rows (subtotal, discount if any, total)
+		const footerRows = document.querySelectorAll('#itemsTable tfoot tr');
+		footerRows.forEach(r => {
+			const label = r.querySelector('td:nth-child(1)').innerText;
+			const amount = r.querySelector('td:last-child').innerText.replace('₱','');
+			csv += `${label},,,${amount}\n`;
+		});
 		const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
 		const url = URL.createObjectURL(blob);
 		const a = document.createElement('a');

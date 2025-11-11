@@ -257,7 +257,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     <i class="bi bi-info-circle me-1"></i>
                     Default admin: admin / admin123
                     <?php // Dev helper link ?>
-                    <br><a href="?seed=admin" class="text-decoration-none">Reset admin (dev)</a>
+                  <!--  <br><a href="?seed=admin" class="text-decoration-none">Reset admin (dev)</a> -->
                 </small>
             </div>
         </div>
